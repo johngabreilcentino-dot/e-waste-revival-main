@@ -7,7 +7,7 @@ const links = [
   { to: "/" as const, label: "Home" },
   { to: "/about" as const, label: "About" },
   { to: "/services" as const, label: "Services" },
-  { to: "/contact" as const, label: "Contact" },
+  { to: "/profile" as const, label: "Profile" },
 ];
 
 export function SiteHeader() {
