@@ -1,10 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Heart, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { iwsWomen } from "@/lib/iws-women";
+import { supabase } from "@/lib/supabase";
+import { iwsWomen, type IwsWoman } from "@/lib/iws-women";
 
-export const Route = createFileRoute("/profile")({
+type IwsProfileRow = {
+  id: string;
+  name: string;
+  title: string;
+  location: string;
+  photo_url: string;
+  summary: string;
+  story: string;
+  focus: string;
+  goal: string;
+  sponsorship: string | null;
+  impact: string;
+};
+
+export const Route = createFileRoute("/iws-profile")({
   head: () => ({
     meta: [
       { title: "Sponsor an IWS woman — e-waste ready" },
@@ -19,6 +35,42 @@ export const Route = createFileRoute("/profile")({
 });
 
 function SponsorsPage() {
+  const [women, setWomen] = useState<IwsWoman[]>(iwsWomen);
+  const [loading, setLoading] = useState(true);
+  const [usingFallback, setUsingFallback] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfiles() {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("iws_profiles")
+        .select("id,name,title,location,photo_url,summary,story,focus,goal,sponsorship,impact")
+        .order("name", { ascending: true });
+
+      if (!active) return;
+
+      if (error || !data?.length) {
+        setWomen(iwsWomen);
+        setUsingFallback(true);
+        setLoading(false);
+        return;
+      }
+
+      setWomen(data.map(mapProfileRow));
+      setUsingFallback(false);
+      setLoading(false);
+    }
+
+    loadProfiles();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -32,15 +84,17 @@ function SponsorsPage() {
             See their background, mission, and how you can support them.
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Each profile shows a real woman leading an e-waste solution in her community.
-            Sponsors can choose who they want to support and learn how their contribution
-            makes a concrete impact.
+            Each profile shows a real woman leading an e-waste solution in her community. Sponsors
+            can choose who they want to support and learn how their contribution makes a concrete
+            impact.
           </p>
 
           <div className="mt-10 rounded-[2rem] border border-border bg-card p-10 shadow-elevated">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-wider text-primary">How sponsoring works</p>
+                <p className="text-sm uppercase tracking-wider text-primary">
+                  How sponsoring works
+                </p>
                 <h2 className="mt-2 text-3xl font-semibold text-foreground">
                   Choose a woman, read her story, and support her next project.
                 </h2>
@@ -57,18 +111,27 @@ function SponsorsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        {loading ? (
+          <p className="mb-6 text-sm text-muted-foreground">Loading IWS profiles...</p>
+        ) : null}
+        {!loading && !usingFallback ? (
+          <p className="mb-6 rounded-3xl border border-primary/20 bg-primary/5 px-5 py-3 text-sm text-primary">
+            IWS profiles loaded from your Supabase database.
+          </p>
+        ) : null}
+        {usingFallback ? (
+          <p className="mb-6 rounded-3xl border border-border bg-card px-5 py-3 text-sm text-muted-foreground">
+            Showing sample IWS profiles while Supabase data is unavailable.
+          </p>
+        ) : null}
         <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
-          {iwsWomen.map((woman) => (
+          {women.map((woman) => (
             <article
               key={woman.id}
               className="rounded-[2rem] border border-border bg-card p-6 shadow-soft transition hover:shadow-elevated"
             >
               <div className="overflow-hidden rounded-[1.75rem] bg-slate-950/5">
-                <img
-                  src={woman.photo}
-                  alt={woman.name}
-                  className="h-64 w-full object-cover"
-                />
+                <img src={woman.photo} alt={woman.name} className="h-64 w-full object-cover" />
               </div>
 
               <div className="mt-5">
@@ -127,4 +190,20 @@ function SponsorsPage() {
       <SiteFooter />
     </div>
   );
+}
+
+function mapProfileRow(row: IwsProfileRow): IwsWoman {
+  return {
+    id: row.id,
+    name: row.name,
+    title: row.title,
+    location: row.location,
+    photo: row.photo_url,
+    summary: row.summary,
+    story: row.story,
+    focus: row.focus,
+    goal: row.goal,
+    sponsorship: row.sponsorship ?? "",
+    impact: row.impact,
+  };
 }
