@@ -6,6 +6,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { EcoMap } from "@/components/EcoMap";
 import { drives, policies, PH_CENTER } from "@/lib/ewaste-data";
+import heroWorkers from "@/assets/484031.jpg";
+
+const homeImages = {
+  devices:
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,7 +23,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function HomePage() {
+export function HomePage() {
   const [tab, setTab] = useState<"drives" | "policies">("drives");
 
   return (
@@ -26,10 +32,15 @@ function HomePage() {
 
       {/* HERO */}
       <section className="relative overflow-hidden">
+        <img
+          src={heroWorkers}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 h-full w-full object-cover opacity-45"
+        />
         <div
           aria-hidden
-          className="absolute inset-0 -z-10"
-          style={{ background: "var(--gradient-soft)" }}
+          className="absolute inset-0 -z-10 bg-gradient-to-br from-background via-background/90 to-primary/30"
         />
         <div
           aria-hidden
@@ -86,7 +97,7 @@ function HomePage() {
 
           <div className="relative">
             <div className="absolute inset-0 -z-10 rounded-[2rem] rotate-3" style={{ background: "var(--gradient-leaf)" }} />
-            <div className="rounded-[2rem] bg-card border border-border p-8 shadow-elevated">
+            <div className="rounded-[2rem] bg-card/90 border border-border p-8 shadow-elevated backdrop-blur-sm">
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { icon: Cpu, t: "Phones & laptops", c: "leaf" },
@@ -94,7 +105,7 @@ function HomePage() {
                   { icon: ShieldCheck, t: "Certified disposal", c: "leaf" },
                   { icon: Leaf, t: "Zero landfill", c: "accent" },
                 ].map(({ icon: Icon, t }, i) => (
-                  <div key={i} className="rounded-2xl bg-leaf-soft/60 p-5 border border-border/50">
+                  <div key={i} className="rounded-2xl bg-leaf-soft/70 p-5 border border-border/50">
                     <Icon className="h-6 w-6 text-primary" />
                     <div className="mt-3 font-medium text-sm text-foreground">{t}</div>
                   </div>
@@ -160,7 +171,15 @@ function HomePage() {
             Every device has a second life.
           </h2>
         </div>
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
+        <div className="mt-12 grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-stretch">
+          <div className="overflow-hidden rounded-[2rem] border border-border bg-card shadow-soft">
+            <img
+              src={homeImages.devices}
+              alt="Laptop on a desk representing electronics that can be reused or recycled"
+              className="h-full min-h-[22rem] w-full object-cover"
+            />
+          </div>
+          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-1">
           {[
             { t: "Protect ecosystems", d: "Toxic metals from electronics seep into soil and water. Proper recycling stops the cycle.", icon: Leaf },
             { t: "Recover materials", d: "Gold, copper, and rare earths can be reclaimed and reused — reducing mining demand.", icon: Recycle },
@@ -174,6 +193,7 @@ function HomePage() {
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{d}</p>
             </div>
           ))}
+          </div>
         </div>
       </section>
 

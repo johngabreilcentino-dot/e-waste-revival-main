@@ -1,9 +1,10 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import { LogIn, LogOut, Menu, UserCircle, UserPlus, X } from "lucide-react";
+import { LogIn, LogOut, Menu, ShieldCheck, UserCircle, UserPlus, X } from "lucide-react";
 import logo from "@/assets/e-waste-logo.png";
 import { supabase } from "@/lib/supabase";
+import { loadIsAdmin } from "@/lib/admin";
 import { AuthDialog } from "@/components/auth/AuthDialog";
 import { AuthStatusDialog } from "@/components/auth/AuthStatusDialog";
 import type { AuthMode } from "@/components/auth/AuthForm";
@@ -16,6 +17,7 @@ const links = [
 ];
 
 export function SiteHeader() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -24,6 +26,7 @@ export function SiteHeader() {
   const [statusTitle, setStatusTitle] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -43,6 +46,27 @@ export function SiteHeader() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    async function checkAdmin() {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const allowed = await loadIsAdmin(user);
+
+      if (active) setIsAdmin(allowed);
+    }
+
+    checkAdmin();
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
   function openAuthModal(mode: AuthMode) {
     setAuthMode(mode);
@@ -68,6 +92,7 @@ export function SiteHeader() {
 
     setStatusTitle("Logged out");
     setStatusMessage("You have been logged out successfully.");
+    navigate({ to: "/" });
     window.setTimeout(() => setStatusOpen(false), 1200);
   }
 
@@ -102,12 +127,13 @@ export function SiteHeader() {
                 className="rounded-full p-2 text-foreground transition-colors hover:bg-leaf-soft"
                 aria-label="Account menu"
               >
-                <UserCircle className="h-8 w-8" />
+                <AccountAvatar user={user} size="lg" />
               </button>
 
               {profileOpen && (
                 <AccountMenu
                   user={user}
+                  isAdmin={isAdmin}
                   onLogin={() => openAuthModal("login")}
                   onSignup={() => openAuthModal("signup")}
                   onLogout={handleLogout}
@@ -144,13 +170,14 @@ export function SiteHeader() {
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-foreground/80 hover:bg-leaf-soft"
               >
-                <UserCircle className="h-5 w-5" />
+                <AccountAvatar user={user} size="sm" />
                 Account
               </button>
               {profileOpen && (
                 <div className="mt-3 rounded-2xl border border-border/60 bg-card/80 px-3 py-3">
                   <MobileAccountMenu
                     user={user}
+                    isAdmin={isAdmin}
                     onLogin={() => openAuthModal("login")}
                     onSignup={() => openAuthModal("signup")}
                     onLogout={handleLogout}
@@ -184,12 +211,14 @@ export function SiteHeader() {
 
 function AccountMenu({
   user,
+  isAdmin,
   onLogin,
   onSignup,
   onLogout,
   onClose,
 }: {
   user: User | null;
+  isAdmin: boolean;
   onLogin: () => void;
   onSignup: () => void;
   onLogout: () => void;
@@ -207,13 +236,23 @@ function AccountMenu({
         {user ? (
           <>
             <Link
-              to="/iws-profile"
+              to="/profile"
               onClick={onClose}
               className="inline-flex w-full items-center gap-3 rounded-lg bg-leaf-soft/50 px-4 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
             >
-              <UserCircle className="h-4 w-4" />
-              <span>IWS Profile</span>
+              <AccountAvatar user={user} size="sm" />
+              <span>Profile</span>
             </Link>
+            {isAdmin ? (
+              <Link
+                to="/admin/iws-profiles"
+                onClick={onClose}
+                className="inline-flex w-full items-center gap-3 rounded-lg bg-primary/10 px-4 py-3 text-sm font-medium text-primary transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
+              >
+                <ShieldCheck className="h-4 w-4" />
+                <span>Admin IWS</span>
+              </Link>
+            ) : null}
             <button
               onClick={onLogout}
               className="inline-flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:bg-destructive hover:text-destructive-foreground"
@@ -245,14 +284,64 @@ function AccountMenu({
   );
 }
 
+function AccountAvatar({ user, size }: { user: User | null; size: "sm" | "lg" }) {
+  const [failed, setFailed] = useState(false);
+  const rawAvatarUrl = getAvatarUrl(user);
+  const avatarUrl = failed ? null : rawAvatarUrl;
+  const imageSize = size === "lg" ? "h-8 w-8" : "h-5 w-5";
+  const iconSize = size === "lg" ? "h-8 w-8" : "h-5 w-5";
+
+  useEffect(() => {
+    setFailed(false);
+  }, [rawAvatarUrl]);
+
+  if (avatarUrl) {
+    return (
+      <img
+        src={avatarUrl}
+        alt={user?.email ? `${user.email} profile photo` : "Account profile photo"}
+        onError={() => setFailed(true)}
+        className={`${imageSize} rounded-full border border-border object-cover shadow-soft`}
+      />
+    );
+  }
+
+  return <UserCircle className={iconSize} />;
+}
+
+function getAvatarUrl(user: User | null) {
+  if (!user) return null;
+
+  const metadata = user.user_metadata;
+  const metadataAvatar = metadata.avatar_url ?? metadata.picture ?? metadata.avatar;
+
+  if (typeof metadataAvatar === "string" && metadataAvatar.trim().length > 0) {
+    return metadataAvatar;
+  }
+
+  for (const identity of user.identities ?? []) {
+    const identityData = identity.identity_data;
+    const identityAvatar =
+      identityData?.avatar_url ?? identityData?.picture ?? identityData?.avatar;
+
+    if (typeof identityAvatar === "string" && identityAvatar.trim().length > 0) {
+      return identityAvatar;
+    }
+  }
+
+  return null;
+}
+
 function MobileAccountMenu({
   user,
+  isAdmin,
   onLogin,
   onSignup,
   onLogout,
   onClose,
 }: {
   user: User | null;
+  isAdmin: boolean;
   onLogin: () => void;
   onSignup: () => void;
   onLogout: () => void;
@@ -266,13 +355,23 @@ function MobileAccountMenu({
       {user ? (
         <>
           <Link
-            to="/iws-profile"
+            to="/profile"
             onClick={onClose}
             className="inline-flex w-full items-center gap-3 rounded-3xl bg-leaf-soft/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-primary hover:text-primary-foreground"
           >
-            <UserCircle className="h-4 w-4" />
-            <span>IWS Profile</span>
+            <AccountAvatar user={user} size="sm" />
+            <span>Profile</span>
           </Link>
+          {isAdmin ? (
+            <Link
+              to="/admin/iws-profiles"
+              onClick={onClose}
+              className="mt-2 inline-flex w-full items-center gap-3 rounded-3xl bg-primary/10 px-4 py-3 text-sm font-medium text-primary transition hover:bg-primary hover:text-primary-foreground"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span>Admin IWS</span>
+            </Link>
+          ) : null}
           <button
             onClick={onLogout}
             className="mt-2 inline-flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-sm font-medium text-foreground transition hover:bg-destructive hover:text-destructive-foreground"

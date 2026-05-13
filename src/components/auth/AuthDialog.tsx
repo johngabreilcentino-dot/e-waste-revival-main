@@ -12,9 +12,20 @@ type AuthDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onModeChange: (mode: AuthMode) => void;
+  onSuccess?: () => void;
+  oauthRedirectTo?: string;
+  redirectOnLogin?: boolean;
 };
 
-export function AuthDialog({ mode, open, onOpenChange, onModeChange }: AuthDialogProps) {
+export function AuthDialog({
+  mode,
+  open,
+  onOpenChange,
+  onModeChange,
+  onSuccess,
+  oauthRedirectTo,
+  redirectOnLogin,
+}: AuthDialogProps) {
   const isLogin = mode === "login";
 
   return (
@@ -26,15 +37,17 @@ export function AuthDialog({ mode, open, onOpenChange, onModeChange }: AuthDialo
           </DialogTitle>
           <DialogDescription>
             {isLogin
-              ? "Use your email and password to continue."
-              : "Sign up with your email to start saving your account details."}
+              ? "Use Google or your email and password to continue."
+              : "Sign up with Google or email to start saving your account details."}
           </DialogDescription>
         </DialogHeader>
 
         <AuthForm
           mode={mode}
-          onSuccess={() => onOpenChange(false)}
+          onSuccess={onSuccess ?? (() => onOpenChange(false))}
           onModeChange={onModeChange}
+          oauthRedirectTo={oauthRedirectTo}
+          redirectOnLogin={redirectOnLogin}
           successDelayMs={1200}
         />
       </DialogContent>

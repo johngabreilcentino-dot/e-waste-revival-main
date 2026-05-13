@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { User } from "@supabase/supabase-js";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import type { AuthMode } from "@/components/auth/AuthForm";
 import { supabase } from "@/lib/supabase";
 import { iwsWomen, type IwsWoman } from "@/lib/iws-women";
 
@@ -35,9 +38,14 @@ export const Route = createFileRoute("/iws-profile")({
 });
 
 function SponsorsPage() {
+  const navigate = useNavigate();
   const [women, setWomen] = useState<IwsWoman[]>(iwsWomen);
   const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [pendingSponsor, setPendingSponsor] = useState<IwsWoman | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -70,6 +78,51 @@ function SponsorsPage() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setUser(data.session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user ?? null;
+
+      setUser(currentUser);
+
+      if (currentUser && pendingSponsor) {
+        setAuthOpen(false);
+        navigate({ to: "/contact" });
+      }
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate, pendingSponsor]);
+
+  function handleSponsor(woman: IwsWoman) {
+    if (user) {
+      navigate({ to: "/contact" });
+      return;
+    }
+
+    setPendingSponsor(woman);
+    setAuthMode("login");
+    setAuthOpen(true);
+  }
+
+  function handleAuthSuccess() {
+    setAuthOpen(false);
+
+    if (pendingSponsor) {
+      navigate({ to: "/contact" });
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -117,11 +170,6 @@ function SponsorsPage() {
         {!loading && !usingFallback ? (
           <p className="mb-6 rounded-3xl border border-primary/20 bg-primary/5 px-5 py-3 text-sm text-primary">
             IWS profiles loaded from your Supabase database.
-          </p>
-        ) : null}
-        {usingFallback ? (
-          <p className="mb-6 rounded-3xl border border-border bg-card px-5 py-3 text-sm text-muted-foreground">
-            Showing sample IWS profiles while Supabase data is unavailable.
           </p>
         ) : null}
         <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
@@ -172,14 +220,17 @@ function SponsorsPage() {
               </details>
 
               <div className="mt-6 flex flex-col gap-3">
-                <Link
-                  to="/contact"
+                <button
+                  type="button"
+                  onClick={() => handleSponsor(woman)}
                   className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
                 >
                   Sponsor {woman.name}
-                </Link>
+                </button>
                 <span className="text-xs text-muted-foreground">
-                  Sponsors can contact us to specify the woman and support preference.
+                  {user
+                    ? "Sponsors can contact us to specify the woman and support preference."
+                    : "Log in or create an account first to sponsor this IWS profile."}
                 </span>
               </div>
             </article>
@@ -188,6 +239,17 @@ function SponsorsPage() {
       </section>
 
       <SiteFooter />
+      <AuthDialog
+        mode={authMode}
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onModeChange={setAuthMode}
+        oauthRedirectTo={
+          typeof window === "undefined" ? undefined : `${window.location.origin}/contact`
+        }
+        redirectOnLogin={false}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }

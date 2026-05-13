@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IwsProfileRouteImport } from './routes/iws-profile'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIwsProfilesRouteImport } from './routes/admin/iws-profiles'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -25,6 +27,11 @@ const SignupRoute = SignupRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -52,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIwsProfilesRoute = AdminIwsProfilesRouteImport.update({
+  id: '/admin/iws-profiles',
+  path: '/admin/iws-profiles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,8 +71,10 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/iws-profile': typeof IwsProfileRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/iws-profiles': typeof AdminIwsProfilesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +82,10 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/iws-profile': typeof IwsProfileRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/iws-profiles': typeof AdminIwsProfilesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +94,10 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/iws-profile': typeof IwsProfileRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/services': typeof ServicesRoute
   '/signup': typeof SignupRoute
+  '/admin/iws-profiles': typeof AdminIwsProfilesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +107,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/iws-profile'
     | '/login'
+    | '/profile'
     | '/services'
     | '/signup'
+    | '/admin/iws-profiles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +118,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/iws-profile'
     | '/login'
+    | '/profile'
     | '/services'
     | '/signup'
+    | '/admin/iws-profiles'
   id:
     | '__root__'
     | '/'
@@ -107,8 +129,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/iws-profile'
     | '/login'
+    | '/profile'
     | '/services'
     | '/signup'
+    | '/admin/iws-profiles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,8 +141,10 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   IwsProfileRoute: typeof IwsProfileRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   ServicesRoute: typeof ServicesRoute
   SignupRoute: typeof SignupRoute
+  AdminIwsProfilesRoute: typeof AdminIwsProfilesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -172,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/iws-profiles': {
+      id: '/admin/iws-profiles'
+      path: '/admin/iws-profiles'
+      fullPath: '/admin/iws-profiles'
+      preLoaderRoute: typeof AdminIwsProfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -181,8 +221,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   IwsProfileRoute: IwsProfileRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   ServicesRoute: ServicesRoute,
   SignupRoute: SignupRoute,
+  AdminIwsProfilesRoute: AdminIwsProfilesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,15 +14,167 @@ create table if not exists public.iws_profiles (
   updated_at timestamptz not null default now()
 );
 
+alter table public.iws_profiles
+drop column if exists is_hidden;
+
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  email text not null unique,
+  created_at timestamptz not null default now()
+);
+
 alter table public.iws_profiles enable row level security;
+alter table public.admin_users enable row level security;
+
+insert into storage.buckets (id, name, public)
+values ('iws-photos', 'iws-photos', true)
+on conflict (id) do update set public = true;
 
 drop policy if exists "IWS profiles are publicly readable" on public.iws_profiles;
+drop policy if exists "IWS profiles are admin insertable" on public.iws_profiles;
+drop policy if exists "IWS profiles are admin updatable" on public.iws_profiles;
+drop policy if exists "IWS profiles are admin deletable" on public.iws_profiles;
+drop policy if exists "Admin users can read their own admin record" on public.admin_users;
+drop policy if exists "IWS photos are publicly readable" on storage.objects;
+drop policy if exists "IWS photos are admin insertable" on storage.objects;
+drop policy if exists "IWS photos are admin updatable" on storage.objects;
+drop policy if exists "IWS photos are admin deletable" on storage.objects;
 
 create policy "IWS profiles are publicly readable"
 on public.iws_profiles
 for select
 to anon, authenticated
 using (true);
+
+create policy "IWS profiles are admin insertable"
+on public.iws_profiles
+for insert
+to authenticated
+with check (
+  (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+  or
+  exists (
+    select 1
+    from public.admin_users
+    where admin_users.user_id = auth.uid()
+      or admin_users.email = (auth.jwt() ->> 'email')
+  )
+);
+
+create policy "IWS profiles are admin updatable"
+on public.iws_profiles
+for update
+to authenticated
+using (
+  (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+  or
+  exists (
+    select 1
+    from public.admin_users
+    where admin_users.user_id = auth.uid()
+      or admin_users.email = (auth.jwt() ->> 'email')
+  )
+)
+with check (
+  (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+  or
+  exists (
+    select 1
+    from public.admin_users
+    where admin_users.user_id = auth.uid()
+      or admin_users.email = (auth.jwt() ->> 'email')
+  )
+);
+
+create policy "IWS profiles are admin deletable"
+on public.iws_profiles
+for delete
+to authenticated
+using (
+  (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+  or
+  exists (
+    select 1
+    from public.admin_users
+    where admin_users.user_id = auth.uid()
+      or admin_users.email = (auth.jwt() ->> 'email')
+  )
+);
+
+create policy "Admin users can read their own admin record"
+on public.admin_users
+for select
+to authenticated
+using (user_id = auth.uid() or email = (auth.jwt() ->> 'email'));
+
+create policy "IWS photos are publicly readable"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id = 'iws-photos');
+
+create policy "IWS photos are admin insertable"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'iws-photos'
+  and (
+    (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+    or exists (
+      select 1
+      from public.admin_users
+      where admin_users.user_id = auth.uid()
+        or admin_users.email = (auth.jwt() ->> 'email')
+    )
+  )
+);
+
+create policy "IWS photos are admin updatable"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'iws-photos'
+  and (
+    (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+    or exists (
+      select 1
+      from public.admin_users
+      where admin_users.user_id = auth.uid()
+        or admin_users.email = (auth.jwt() ->> 'email')
+    )
+  )
+)
+with check (
+  bucket_id = 'iws-photos'
+  and (
+    (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+    or exists (
+      select 1
+      from public.admin_users
+      where admin_users.user_id = auth.uid()
+        or admin_users.email = (auth.jwt() ->> 'email')
+    )
+  )
+);
+
+create policy "IWS photos are admin deletable"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'iws-photos'
+  and (
+    (auth.jwt() ->> 'email') = 'johngabreilcentino@gmail.com'
+    or exists (
+      select 1
+      from public.admin_users
+      where admin_users.user_id = auth.uid()
+        or admin_users.email = (auth.jwt() ->> 'email')
+    )
+  )
+);
 
 insert into public.iws_profiles (
   name,
