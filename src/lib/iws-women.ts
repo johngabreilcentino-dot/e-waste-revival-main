@@ -21,16 +21,15 @@ export const iwsWomen: IwsWoman[] = [
     photo:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80",
     summary:
-      "Maria trains youth to repair small electronics while recovering parts safely and sustainably.",
+      "Maria trains youth to assess small appliances while recovering parts safely and sustainably.",
     story:
-      "Maria grew up in a small barangay where old phones and laptops were left to rot. She now runs repair workshops that teach practical electronics skills and keep e-waste out of landfills.",
+      "Maria grew up in a small barangay where broken fans, rice cookers, and microwaves were left to rot. She now runs workshops that teach safe appliance handling and keep bulky e-waste out of landfills.",
     focus: "Repair training",
-    goal:
-      "Raise ₱120,000 for tools, parts, transport, and workshop supplies.",
+    goal: "Raise ₱120,000 for tools, parts, transport, and workshop supplies.",
     sponsorship:
       "Sponsor Maria to expand her training program and support 40 young learners this year.",
     impact:
-      "Your support helps 40 students gain repair skills, recycles 500kg of electronics, and creates local green jobs.",
+      "Your support helps 40 students gain appliance recovery skills, recycles 500kg of e-waste, and creates local green jobs.",
   },
   {
     id: "ana-velasquez",
@@ -44,12 +43,10 @@ export const iwsWomen: IwsWoman[] = [
     story:
       "After seeing toxic waste contaminate a river near her community, Ana launched neighborhood campaigns to educate parents and teachers about safe disposal and recycling.",
     focus: "Community outreach",
-    goal:
-      "Secure ₱90,000 for event materials, transport, and educational kits.",
-    sponsorship:
-      "Support Ana to reach 2,000 households with workshops and school visits.",
+    goal: "Secure ₱90,000 for event materials, transport, and educational kits.",
+    sponsorship: "Support Ana to reach 2,000 households with workshops and school visits.",
     impact:
-      "Each sponsorship helps prevent harmful electronics from entering waterways while building long-term recycling habits.",
+      "Each sponsorship helps prevent harmful appliance waste from entering waterways while building long-term recycling habits.",
   },
   {
     id: "camila-reyes",
@@ -58,17 +55,15 @@ export const iwsWomen: IwsWoman[] = [
     location: "Quezon City",
     photo:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
-    summary:
-      "Camila teaches women and seniors how to reuse refurbished devices safely and confidently.",
+    summary: "Camila teaches women and seniors how to safely reuse repaired small appliances.",
     story:
-      "Camila collects donated devices, oversees safe data wiping, and coaches learners on using refurbished electronics for work and education.",
+      "Camila collects donated small appliances, coordinates safe repair checks, and coaches learners on practical reuse at home.",
     focus: "Refurbish + reuse",
-    goal:
-      "Raise ₱110,000 for refurbishment equipment, internet access, and training sessions.",
+    goal: "Raise ₱110,000 for refurbishment equipment, internet access, and training sessions.",
     sponsorship:
-      "Help Camila provide 60 refurbished devices with training to families in need.",
+      "Help Camila provide 60 repaired small appliances with training to families in need.",
     impact:
-      "Your support transforms old devices into tools for education, livelihood, and community resilience.",
+      "Your support transforms old appliances into useful household tools and local livelihood opportunities.",
   },
   {
     id: "jessica-castro",
@@ -82,8 +77,7 @@ export const iwsWomen: IwsWoman[] = [
     story:
       "Jessica works with local governments to create collection points and program guides, helping barangays comply with e-waste laws without extra cost.",
     focus: "Policy + partnerships",
-    goal:
-      "Secure ₱130,000 for pilot collection points, training materials, and community events.",
+    goal: "Secure ₱130,000 for pilot collection points, training materials, and community events.",
     sponsorship:
       "Support Jessica to launch new drop-off hubs and awareness drives in Metro Manila.",
     impact:

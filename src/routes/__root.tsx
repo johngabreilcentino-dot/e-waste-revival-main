@@ -73,10 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "e-waste ready — Responsible E-Waste in the Philippines" },
-      { name: "description", content: "Find e-waste collection drives, learn local policies, and dispose your electronics responsibly across the Philippines." },
+      {
+        name: "description",
+        content:
+          "Find appliance e-waste collection drives, learn local policies, and dispose of old appliances responsibly across the Philippines.",
+      },
       { name: "author", content: "e-waste ready" },
       { property: "og:title", content: "e-waste ready — Responsible E-Waste in the Philippines" },
-      { property: "og:description", content: "Drives, policies, and education for greener electronics in the Philippines." },
+      {
+        property: "og:description",
+        content:
+          "Drives, policies, and education for greener appliance recycling in the Philippines.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },

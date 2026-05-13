@@ -8,7 +8,10 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — e-waste ready" },
-      { name: "description", content: "Reach the e-waste ready team for pickups, partnerships, and questions." },
+      {
+        name: "description",
+        content: "Reach the e-waste ready team for appliance pickups, partnerships, and questions.",
+      },
     ],
   }),
   component: ContactPage,
@@ -23,13 +26,15 @@ function ContactPage() {
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-2 gap-12">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-primary">Contact</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+            Contact
+          </span>
           <h1 className="mt-3 text-5xl sm:text-6xl font-semibold text-foreground leading-tight">
             Let's keep the Philippines green, together.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-lg">
-            Got a question, want to host a drive, or interested in partnering? Drop us a note and
-            we'll be in touch within two business days.
+            Got old appliances to dispose of, want to host a drive, or interested in partnering?
+            Drop us a note and we'll be in touch within two business days.
           </p>
 
           <ul className="mt-10 space-y-5">
@@ -43,7 +48,9 @@ function ContactPage() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {label}
+                  </div>
                   <div className="text-foreground font-medium mt-0.5">{v}</div>
                 </div>
               </li>
@@ -59,12 +66,23 @@ function ContactPage() {
           className="rounded-[2rem] bg-card border border-border p-8 sm:p-10 shadow-elevated"
         >
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Name"><input required className={fieldCls} placeholder="Juan dela Cruz" /></Field>
-            <Field label="Email"><input required type="email" className={fieldCls} placeholder="you@example.com" /></Field>
+            <Field label="Name">
+              <input required className={fieldCls} placeholder="Juan dela Cruz" />
+            </Field>
+            <Field label="Email">
+              <input required type="email" className={fieldCls} placeholder="you@example.com" />
+            </Field>
           </div>
-          <Field label="Subject"><input className={fieldCls} placeholder="How can we help?" /></Field>
+          <Field label="Subject">
+            <input className={fieldCls} placeholder="Appliance pickup request" />
+          </Field>
           <Field label="Message">
-            <textarea required rows={6} className={fieldCls + " resize-none"} placeholder="Tell us a bit about your request..." />
+            <textarea
+              required
+              rows={6}
+              className={fieldCls + " resize-none"}
+              placeholder="Tell us what appliance you want to recycle and where it is located."
+            />
           </Field>
 
           <button
@@ -91,7 +109,9 @@ const fieldCls =
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block mt-4 first:mt-0">
-      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       <div className="mt-1.5">{children}</div>
     </label>
   );

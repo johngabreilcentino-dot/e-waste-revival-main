@@ -30,7 +30,7 @@ export const Route = createFileRoute("/iws-profile")({
       {
         name: "description",
         content:
-          "Meet IWS women leaders working on repair, reuse, education, and community recycling across the Philippines.",
+          "Meet IWS women leaders working on appliance repair, reuse, education, and community recycling across the Philippines.",
       },
     ],
   }),
@@ -137,9 +137,9 @@ function SponsorsPage() {
             See their background, mission, and how you can support them.
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Each profile shows a real woman leading an e-waste solution in her community. Sponsors
-            can choose who they want to support and learn how their contribution makes a concrete
-            impact.
+            Each profile shows a real woman leading an appliance e-waste solution in her community.
+            Sponsors can choose who they want to support and learn how their contribution makes a
+            concrete impact.
           </p>
 
           <div className="mt-10 rounded-[2rem] border border-border bg-card p-10 shadow-elevated">
