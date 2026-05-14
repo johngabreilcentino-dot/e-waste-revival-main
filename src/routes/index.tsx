@@ -220,8 +220,8 @@ export function HomePage() {
                 icon: Recycle,
               },
               {
-                t: "Comply with RA 11898",
-                d: "The EPR Act encourages responsible recovery and disposal of covered waste streams.",
+                t: "Comply with RA 6969",
+                d: "The Toxic Substances and Hazardous and Nuclear Wastes Control Act covers proper handling and disposal of hazardous e-waste.",
                 icon: ShieldCheck,
               },
             ].map(({ t, d, icon: Icon }) => (
